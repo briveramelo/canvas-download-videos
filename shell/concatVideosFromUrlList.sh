@@ -8,5 +8,16 @@
 #file https://www.example.com/myVideoUrl2
 #...
 VIDEO_URLS_INPUT_PATH=$1
-OUTPUT_PATH=$2
-ffmpeg -f concat -safe 0 -protocol_whitelist "file,http,https,tcp,tls" -i "$VIDEO_URLS_INPUT_PATH" -vcodec libx264 -crf 28 "$OUTPUT_PATH"
+if [[ -d $VIDEO_URLS_INPUT_PATH ]]; then
+  echo "creating videos for all .txt files in this folder"
+  files=($( ls "$VIDEO_URLS_INPUT_PATH" ))
+  for ((i=0; i<${#files[@]}; i++)); do
+    #do something to each element of array
+    files[$i]="$VIDEO_URLS_INPUT_PATH/${files[$i]}"
+    echo "${files[$i]%.*}"
+    ffmpeg -f concat -safe 0 -protocol_whitelist "file,http,https,tcp,tls" -i "${files[$i]}" -vcodec libx264 -crf 28 "${files[$i]%.*}.mp4"
+done
+else
+  OUTPUT_PATH=$2
+  ffmpeg -f concat -safe 0 -protocol_whitelist "file,http,https,tcp,tls" -i "$VIDEO_URLS_INPUT_PATH" -vcodec libx264 -crf 28 "$OUTPUT_PATH"
+fi
