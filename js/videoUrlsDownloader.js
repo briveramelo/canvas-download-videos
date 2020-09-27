@@ -13,18 +13,28 @@ function onGetVideoSegmentManifest(videoSegmentManifest)
     }
     let file = new Blob(videoSegmentUrls,{ type: "text/plain;charset=utf-8" });
     a.href= URL.createObjectURL(file);
-    a.download = '_mgt6051_videoUrls.txt';
+
+    a.download = getFileName();
     a.click();
     URL.revokeObjectURL(a.href);
+}
+
+function getFileName()
+{
+    let title = document.getElementsByClassName("comp titleLabel pull-left")[0].innerText;
+    let titleNum = title.split(" ")[0];
+    let titleLabel = title.substring(titleNum.length, title.length).replace("-", "").replace(/\s+/g, '').replace(",","");
+    return `${titleNum}_acctg6000_${titleLabel}.txt`;
 }
 
 function onGetVideoManifest(manifestText)
 {
     console.log("got video manifest");
     let videoManifestLines = manifestText.split("\n").filter(item => item !== "");
-    let topQualityPlaylistUrl = videoManifestLines[videoManifestLines.length - 1];
+    let playlistUrl1080 = videoManifestLines[videoManifestLines.length - 1];
+    let playlistUrl720 = videoManifestLines[videoManifestLines.length - 2];
 
-    $.get(topQualityPlaylistUrl, onGetVideoSegmentManifest);
+    $.get(playlistUrl720, onGetVideoSegmentManifest);
 }
 
 let videoManifestUrl = document.getElementsByTagName("video")[0].getAttribute("src");
