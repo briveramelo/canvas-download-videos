@@ -17,6 +17,7 @@ function onGetVideoSegmentManifest(videoSegmentManifest)
     a.download = getFileName();
     a.click();
     URL.revokeObjectURL(a.href);
+    tryLoadNextVideo();
 }
 
 function getFileName()
@@ -37,17 +38,37 @@ function onGetVideoManifest(manifestText)
     $.get(playlistUrl720, onGetVideoSegmentManifest);
 }
 
-let videoManifestUrl = document.getElementsByTagName("video")[0].getAttribute("src");
-var className = "ois6040";
-if (videoManifestUrl.startsWith("blob:"))
+function onMediaLoad()
 {
-    function onlyUnique(value, index, self) {
-        return self.indexOf(value) === index;
+    let videoManifestUrl = document.getElementsByTagName("video")[0].getAttribute("src");
+    if (videoManifestUrl.startsWith("blob:"))
+    {
+        function onlyUnique(value, index, self) {
+            return self.indexOf(value) === index;
+        }
+        let playlistUrl = performance.getEntriesByType("resource").filter(item=>item.name.includes("index.m3u8?Policy")).map(item=>item.name).filter(onlyUnique)[0];
+        $.get(playlistUrl, onGetVideoSegmentManifest);
     }
-    let playlistUrl = performance.getEntriesByType("resource").filter(item=>item.name.includes("index.m3u8?Policy")).map(item=>item.name).filter(onlyUnique)[0];
-    $.get(playlistUrl, onGetVideoSegmentManifest);
+    else
+    {
+        $.get(videoManifestUrl, onGetVideoManifest);
+    }
 }
-else
+function tryLoadNextVideo()
 {
-    $.get(videoManifestUrl, onGetVideoManifest);
+    videoIndex++;
+    if(videoIndex >= videoLinks.length)
+    {
+        console.log(`final video loaded: ${videoIndex}/${videoIndex} complete.`);
+        return;
+    }
+
+    //call this to clear the current history of url queries to start fresh for the next download
+    performance.clearResourceTimings();
+    videoLinks[videoIndex].click();
+    setTimeout(onMediaLoad, 3000);
 }
+var videoLinks = $('.chapterBox.mediaBox');
+var videoIndex = -1;
+var className = "finan6022";
+tryLoadNextVideo();
