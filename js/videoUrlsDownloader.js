@@ -90,12 +90,20 @@ async function tryLoadNextVideoRecursive()
 function loadAllVideos()
 {
     videoLinks = $('.chapterBox.mediaBox');
+    if(videoLinks.length === 0)
+    {
+        videoLinks = $('.btn.comp.playPauseBtn.display-high.icon-play');
+    }
     tryLoadNextVideoRecursive();
 }
 
 function loadCurrentVideo()
 {
     videoLinks = $('.chapterBox.mediaBox.active');
+    if(videoLinks.length === 0)
+    {
+        videoLinks = $('.btn.comp.playPauseBtn.display-high.icon-play');
+    }
     tryLoadNextVideoRecursive();
 }
 
@@ -105,7 +113,7 @@ var videoIndex = -1;
 
 
 //options
-var className = "finan6022";
+var className = "finan6026";
 var videoLoadDelay_ms = 4000;
 loadAllVideos();
 // loadCurrentVideo();

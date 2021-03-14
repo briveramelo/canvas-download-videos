@@ -13,7 +13,6 @@ if [[ -d $VIDEO_URLS_INPUT_PATH ]]; then
   echo "creating videos for all .txt files in this folder at the time the script was started"
   files=($( ls "$VIDEO_URLS_INPUT_PATH" ))
   for ((i=0; i<${#files[@]}; i++)); do
-    #do something to each element of array
     files[$i]="$VIDEO_URLS_INPUT_PATH/${files[$i]}"
     echo "${files[$i]%.*}"
     ffmpeg -f concat -safe 0 -protocol_whitelist "file,http,https,tcp,tls" -i "${files[$i]}" -vcodec libx264 -crf 28 "${files[$i]%.*}.mp4"
